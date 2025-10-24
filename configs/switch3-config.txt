@@ -1,0 +1,127 @@
+! Access Switch 3 Configuration
+! Device: Cisco 2960 or similar Layer 2 Switch
+! Purpose: Access layer switch for Finance and IT VLANs
+
+! ========================================
+! Basic Configuration
+! ========================================
+enable
+configure terminal
+
+hostname Switch3
+no ip domain-lookup
+enable secret cisco123
+
+! Configure console access
+line console 0
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Configure VTY access
+line vty 0 15
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Banner
+banner motd #
+********************************************
+*  Authorized Access Only - Switch3       *
+*  Access Layer - Finance & IT            *
+********************************************
+#
+
+! ========================================
+! VLAN Creation
+! ========================================
+vlan 50
+ name Finance
+ exit
+vlan 60
+ name IT
+ exit
+vlan 99
+ name Management
+ exit
+
+! ========================================
+! Configure Management Interface
+! ========================================
+interface vlan 99
+ description Management Interface
+ ip address 192.168.99.13 255.255.255.0
+ no shutdown
+ exit
+
+! Set default gateway
+ip default-gateway 192.168.99.1
+
+! ========================================
+! Configure Trunk Port to Multilayer Switch
+! ========================================
+interface FastEthernet0/24
+ description Trunk to Multilayer Switch
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 50,60,99
+ no shutdown
+ exit
+
+! ========================================
+! Configure Access Ports for PCs
+! ========================================
+! PC5 in VLAN 50 (Finance)
+interface FastEthernet0/1
+ description PC5 - Finance Department
+ switchport mode access
+ switchport access vlan 50
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+ exit
+
+! PC6 in VLAN 60 (IT)
+interface FastEthernet0/2
+ description PC6 - IT Department
+ switchport mode access
+ switchport access vlan 60
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+ exit
+
+! ========================================
+! Shutdown Unused Ports (Optional Security)
+! ========================================
+interface range FastEthernet0/3-23
+ description Unused Ports
+ shutdown
+ exit
+
+! ========================================
+! Save Configuration
+! ========================================
+end
+write memory
+
+! ========================================
+! Verification Commands
+! ========================================
+! show vlan brief
+! show interfaces trunk
+! show interfaces status
+! show port-security
+! show running-config

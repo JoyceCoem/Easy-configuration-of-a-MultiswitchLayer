@@ -1,0 +1,130 @@
+! Router Configuration
+! Device: Cisco 2911 or similar Router
+! Purpose: Border router for external connectivity and NAT
+
+! ========================================
+! Basic Configuration
+! ========================================
+enable
+configure terminal
+
+hostname Router
+no ip domain-lookup
+enable secret cisco123
+
+! Configure console access
+line console 0
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Configure VTY access
+line vty 0 4
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Banner
+banner motd #
+*********************************************
+*  Authorized Access Only - Border Router  *
+*  External Connectivity & NAT             *
+*********************************************
+#
+
+! ========================================
+! Configure Interface to Multilayer Switch
+! ========================================
+interface GigabitEthernet0/0
+ description Connection to Multilayer Switch
+ ip address 10.0.0.1 255.255.255.252
+ ip nat inside
+ no shutdown
+ exit
+
+! ========================================
+! Configure Interface to Cloud/Internet
+! ========================================
+interface GigabitEthernet0/1
+ description Connection to Cloud/Internet
+ ip address dhcp
+ ! Or use static IP: ip address 203.0.113.1 255.255.255.0
+ ip nat outside
+ no shutdown
+ exit
+
+! ========================================
+! Configure NAT (Network Address Translation)
+! ========================================
+! Define internal networks
+access-list 1 permit 192.168.10.0 0.0.0.255
+access-list 1 permit 192.168.20.0 0.0.0.255
+access-list 1 permit 192.168.30.0 0.0.0.255
+access-list 1 permit 192.168.40.0 0.0.0.255
+access-list 1 permit 192.168.50.0 0.0.0.255
+access-list 1 permit 192.168.60.0 0.0.0.255
+access-list 1 permit 192.168.99.0 0.0.0.255
+
+! Configure NAT Overload (PAT)
+ip nat inside source list 1 interface GigabitEthernet0/1 overload
+
+! ========================================
+! Configure Static Routes (if needed)
+! ========================================
+! Route to internal VLANs via Multilayer Switch
+ip route 192.168.10.0 255.255.255.0 10.0.0.2
+ip route 192.168.20.0 255.255.255.0 10.0.0.2
+ip route 192.168.30.0 255.255.255.0 10.0.0.2
+ip route 192.168.40.0 255.255.255.0 10.0.0.2
+ip route 192.168.50.0 255.255.255.0 10.0.0.2
+ip route 192.168.60.0 255.255.255.0 10.0.0.2
+ip route 192.168.99.0 255.255.255.0 10.0.0.2
+
+! Default route to ISP/Cloud (automatically added with DHCP)
+! Or manually: ip route 0.0.0.0 0.0.0.0 <next-hop-ip>
+
+! ========================================
+! Optional: DHCP Server for Internet Interface
+! ========================================
+! Uncomment if not using DHCP client on GigabitEthernet0/1
+! interface GigabitEthernet0/1
+!  ip address 203.0.113.1 255.255.255.0
+!  exit
+
+! ========================================
+! Optional: DNS Configuration
+! ========================================
+ip name-server 8.8.8.8
+ip name-server 8.8.4.4
+
+! ========================================
+! Security Features (Optional)
+! ========================================
+! Enable firewall inspection
+ip inspect name FIREWALL tcp
+ip inspect name FIREWALL udp
+ip inspect name FIREWALL icmp
+
+interface GigabitEthernet0/1
+ ip inspect FIREWALL out
+ exit
+
+! ========================================
+! Save Configuration
+! ========================================
+end
+write memory
+
+! ========================================
+! Verification Commands
+! ========================================
+! show ip interface brief
+! show ip nat translations
+! show ip route
+! show access-lists
+! show running-config
+! ping 8.8.8.8
