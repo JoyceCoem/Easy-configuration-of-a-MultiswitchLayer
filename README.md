@@ -45,8 +45,11 @@ This project demonstrates an enterprise-grade network architecture with:
 ├── README.md                    # This file
 ├── docs/
 │   ├── NETWORK_TOPOLOGY.md      # Detailed network topology documentation
+│   ├── NETWORK_DIAGRAM.md       # Visual network diagrams and flow charts
 │   ├── SETUP_GUIDE.md           # Step-by-step setup instructions
-│   └── VLAN_GUIDE.md            # Comprehensive VLAN configuration guide
+│   ├── VLAN_GUIDE.md            # Comprehensive VLAN configuration guide
+│   ├── TRUNKING_GUIDE.md        # Trunk and inter-VLAN routing guide
+│   └── QUICK_REFERENCE.md       # Quick reference for commands and IPs
 └── configs/
     ├── multilayer-switch-config.txt  # Multilayer switch configuration
     ├── switch1-config.txt            # Access switch 1 configuration
@@ -96,8 +99,11 @@ This project demonstrates an enterprise-grade network architecture with:
 | Document | Description |
 |----------|-------------|
 | [NETWORK_TOPOLOGY.md](docs/NETWORK_TOPOLOGY.md) | Complete network architecture and design |
+| [NETWORK_DIAGRAM.md](docs/NETWORK_DIAGRAM.md) | Visual diagrams and traffic flow examples |
 | [SETUP_GUIDE.md](docs/SETUP_GUIDE.md) | Detailed step-by-step setup instructions |
 | [VLAN_GUIDE.md](docs/VLAN_GUIDE.md) | VLAN configuration and best practices |
+| [TRUNKING_GUIDE.md](docs/TRUNKING_GUIDE.md) | Trunk configuration and inter-VLAN routing |
+| [QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md) | Quick reference for commands and IPs |
 
 ## 🔧 VLAN Configuration
 
