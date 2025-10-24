@@ -12,7 +12,7 @@ This topology showcases how to:
 ---
 
 ## 🗺️ Topology DiagramExample:  
-![Network Topology](./topology-image.png)
+![Network Topology](https://github.com/JoyceCoem/Easy-configuration-of-a-MultiswitchLayer/blob/main/Topology%20image.png?raw=true)
 
 ---
 
