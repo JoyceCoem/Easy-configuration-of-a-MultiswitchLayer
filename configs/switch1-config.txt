@@ -1,0 +1,127 @@
+! Access Switch 1 Configuration
+! Device: Cisco 2960 or similar Layer 2 Switch
+! Purpose: Access layer switch for Sales and Marketing VLANs
+
+! ========================================
+! Basic Configuration
+! ========================================
+enable
+configure terminal
+
+hostname Switch1
+no ip domain-lookup
+enable secret cisco123
+
+! Configure console access
+line console 0
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Configure VTY access
+line vty 0 15
+ password cisco
+ login
+ logging synchronous
+ exec-timeout 5 0
+ exit
+
+! Banner
+banner motd #
+********************************************
+*  Authorized Access Only - Switch1       *
+*  Access Layer - Sales & Marketing       *
+********************************************
+#
+
+! ========================================
+! VLAN Creation
+! ========================================
+vlan 10
+ name Sales
+ exit
+vlan 20
+ name Marketing
+ exit
+vlan 99
+ name Management
+ exit
+
+! ========================================
+! Configure Management Interface
+! ========================================
+interface vlan 99
+ description Management Interface
+ ip address 192.168.99.11 255.255.255.0
+ no shutdown
+ exit
+
+! Set default gateway
+ip default-gateway 192.168.99.1
+
+! ========================================
+! Configure Trunk Port to Multilayer Switch
+! ========================================
+interface FastEthernet0/24
+ description Trunk to Multilayer Switch
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport trunk allowed vlan 10,20,99
+ no shutdown
+ exit
+
+! ========================================
+! Configure Access Ports for PCs
+! ========================================
+! PC1 in VLAN 10 (Sales)
+interface FastEthernet0/1
+ description PC1 - Sales Department
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+ exit
+
+! PC2 in VLAN 20 (Marketing)
+interface FastEthernet0/2
+ description PC2 - Marketing Department
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+ exit
+
+! ========================================
+! Shutdown Unused Ports (Optional Security)
+! ========================================
+interface range FastEthernet0/3-23
+ description Unused Ports
+ shutdown
+ exit
+
+! ========================================
+! Save Configuration
+! ========================================
+end
+write memory
+
+! ========================================
+! Verification Commands
+! ========================================
+! show vlan brief
+! show interfaces trunk
+! show interfaces status
+! show port-security
+! show running-config
